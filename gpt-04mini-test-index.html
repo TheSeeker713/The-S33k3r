@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" x-data="pageState()" :class="{'reality': realityMode}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THE S33K3R</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Alpine.js CDN -->
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <!-- Audio for feedback -->
+  <audio id="static-sfx" src="static-click.mp3" preload="auto"></audio>
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+  <!-- Theme Toggle -->
+  <button @click="toggleReality()" class="fixed top-4 right-4 z-50 p-2 bg-gray-800 rounded">
+    <span x-text="realityMode ? '📡 ARG Mode' : '🔍 Reality Mode'"></span>
+  </button>
+
+  <!-- Live Console Feed -->
+  <div class="fixed bottom-4 left-4 w-64 h-32 bg-black bg-opacity-75 font-mono text-green-400 p-2 overflow-y-auto text-xs">
+    <template x-for="msg in consoleMsgs" :key="msg">
+      <div x-text="msg"></div>
+    </template>
+  </div>
+
+  <!-- Hero Section -->
+  <!-- Hero Section -->
+  <header class="relative h-screen overflow-hidden">
+    <!-- Static Background Canvas -->
+    <canvas id="staticCanvas" class="absolute inset-0 w-full h-full"></canvas>
+    <!-- Parallax Layers -->
+    <div class="absolute inset-0 pointer-events-none" @scroll.window="parallax">
+      <!-- scan lines or silhouettes layers would go here -->
+    </div>
+    <!-- Floating TV & CTA -->
+    <div class="relative z-10 flex flex-col items-center justify-center h-full">
+      <div class="w-64 h-48 bg-gray-900 border-4 border-gray-700 rounded-lg flex items-center justify-center mb-8 animate-pulse">
+        <!-- TV can be CSS-styled -->
+        <div class="w-56 h-40 bg-black bg-white/10"></div>
+      </div>
+      <button @click="scrollTo('r3s3tSection'); playSfx()" class="px-6 py-3 bg-green-500 hover:bg-green-600 rounded text-lg">
+        Listen to the Broadcast
+      </button>
+    </div>
+  </header>
+
+  <main class="space-y-32">
+
+    <!-- R3S3T Embed Section -->
+    <!-- R3S3T Section -->
+    <section id="r3s3tSection" class="py-16 px-4 md:px-16 bg-gray-900">
+      <h2 class="text-3xl mb-4">“R3S3T”</h2>
+      <div class="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
+        <iframe class="w-full md:w-2/3 h-64" src="https://www.youtube.com/embed/VIDEO_ID" loading="lazy" allow="autoplay; encrypted-media"></iframe>
+        <div class="space-y-2">
+          <div>Release Date: <strong>July 1, 2025</strong></div>
+          <div><img src="spotify-icon.svg" alt="Spotify" class="inline w-6 h-6 align-text-bottom"/> ◎ 1.2K listens</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section (Terminal lore) -->
+    <section class="py-16 px-4 md:px-16">
+      <h2 class="text-3xl mb-4">About THE S33K3R</h2>
+      <div class="bg-black border border-green-600 p-6 font-mono text-green-400 relative overflow-hidden">
+        <div x-text="terminalText" class="whitespace-pre-wrap"></div>
+        <span x-show="typing" class="animate-blink">█</span>
+      </div>
+      <!-- Timeline Carousel -->
+      <div x-data="timeline()" class="mt-8">
+        <div class="flex overflow-x-auto space-x-4">
+          <template x-for="item in events" :key="item.date">
+            <div class="min-w-[200px] p-4 bg-gray-800 rounded hover:bg-gray-700 cursor-pointer" @click="select(item)">
+              <h3 class="font-bold" x-text="item.title"></h3>
+              <p class="text-sm" x-text="item.date"></p>
+            </div>
+          </template>
+        </div>
+        <div class="mt-4 p-4 bg-gray-700 rounded">
+          <h3 class="font-semibold" x-text="selected.title"></h3>
+          <p x-text="selected.desc"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Incoming Projects Grid -->
+    <!-- Project Cards Grid -->
+    <section class="py-16 px-4 md:px-16 bg-gray-900">
+      <h2 class="text-3xl mb-8">Incoming Projects</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <template x-for="proj in projects" :key="proj.name">
+          <div @mouseover="playSfx()" class="p-6 bg-gray-800 rounded-lg transform hover:scale-105 transition glitch">
+            <h3 class="text-xl font-bold mb-2" x-text="proj.name"></h3>
+            <p>Coming Soon…</p>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <!-- Join the Resistance -->
+    <section class="py-16 px-4 md:px-16">
+      <h2 class="text-3xl mb-4">Join the Resistance</h2>
+      <div class="bg-black border border-green-600 p-6 font-mono text-green-400 flex items-center space-x-2">
+        <span>>_</span>
+        <input type="email" placeholder="Enter your call sign" class="bg-black outline-none flex-1" />
+        <button @click="playSfx()" class="px-4 py-2 bg-green-500 hover:bg-green-600 rounded">ENTER ↵</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <!-- Footer -->
+  <footer class="py-8 bg-gray-800 text-center">
+    <div class="space-y-2">
+      <p>Paradigm Evolution Productions is Watching.</p>
+      <p>The Reset Has Already Begun.</p>
+    </div>
+    <div class="mt-4 flex justify-center space-x-4 text-2xl">
+      <a href="#" class="hover:text-green-400 flicker"><i class="fab fa-twitter"></i></a>
+      <a href="#" class="hover:text-green-400 flicker"><i class="fab fa-youtube"></i></a>
+      <a href="#" class="hover:text-green-400 flicker"><i class="fab fa-spotify"></i></a>
+    </div>
+  </footer>
+
+  <!-- Alpine.js & Custom Script -->
+  <script>
+    function pageState() {
+      return {
+        realityMode: false,
+        consoleMsgs: [],
+        toggleReality() {
+          this.realityMode = !this.realityMode;
+        },
+        playSfx() {
+          document.getElementById('static-sfx').play();
+        },
+        scrollTo(id) {
+          document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+    function timeline() {
+      return {
+        events: [
+          { date: '2023-09-11', title: 'First Transmission', desc: 'THE S33K3R broadcasts first signal...' },
+          { date: '2024-05-05', title: 'Paradigm Evol. Formed', desc: 'Paradigm Evolution Productions emerges...' },
+          { date: '2025-07-01', title: '“R3S3T” Released', desc: 'First single drops across platforms...' }
+        ],
+        selected: {},
+        init() {
+          this.selected = this.events[0];
+        },
+        select(item) {
+          this.selected = item;
+        }
+      }
+    }
+    document.addEventListener('alpine:init', () => {
+      Alpine.plugin(() => {});
+      Alpine.data('timeline', timeline);
+    });
+    // Static noise canvas script placeholder (implement noise loop here)
+    // Live console feed simulation
+    setInterval(() => {
+      const msgs = [
+        '[SYS] Decoding...',
+        '[RX] Message received.',
+        '[ALERT] Static rising.',
+        '[CLI] > reboot sequence active...'
+      ];
+      const msg = msgs[Math.floor(Math.random() * msgs.length)];
+      document.querySelector('[x-data="pageState()"]').__x.$data.consoleMsgs.push(msg);
+      if (document.querySelector('[x-data="pageState()"]').__x.$data.consoleMsgs.length > 20) {
+        document.querySelector('[x-data="pageState()"]').__x.$data.consoleMsgs.shift();
+      }
+    }, 2000);
+  </script>
+</body>
+</html>
