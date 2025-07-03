@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" x-data="pageState()" :class="{'reality': realityMode}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THE S33K3R</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Alpine.js -->
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <style>
+    @keyframes glitch {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(-2px, -2px); }
+      60% { transform: translate(2px, 2px); }
+      80% { transform: translate(2px, -2px); }
+      100% { transform: translate(0); }
+    }
+    .glitch:hover {
+      animation: glitch 0.5s linear infinite;
+    }
+    .terminal-cursor {
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { from, to { opacity: 1; } 50% { opacity: 0; } }
+    html.reality canvas { display: none; }
+    html.reality .glitch:hover { animation: none; }
+  </style>
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+  <!-- Theme Toggle -->
+  <button @click="toggleReality()" class="fixed top-4 right-4 z-50 p-2 bg-gray-800 rounded hover:bg-gray-700 transition">
+    <span x-text="realityMode ? '📡 ARG Mode' : '🔍 Reality Mode'" class="font-mono text-sm"></span>
+  </button>
+
+  <!-- Live Console Feed -->
+  <div class="fixed bottom-4 left-4 w-64 h-32 bg-black bg-opacity-90 font-mono text-green-400 p-2 overflow-y-auto text-xs border border-green-600 rounded-lg shadow-lg">
+    <div class="font-bold mb-1 text-green-500">CONSOLE FEED:</div>
+    <template x-for="msg in consoleMsgs" :key="msg">
+      <div x-text="msg" class="mb-1"></div>
+    </template>
+  </div>
+
+  <!-- Hero Section -->
+  <header class="relative h-screen overflow-hidden flex flex-col items-center justify-center text-center space-y-8">
+    <!-- Mask definition for text -->
+    <svg class="absolute w-0 h-0" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <mask id="titleMask" x="0" y="0" width="100%" height="100%" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+          <rect width="100%" height="100%" fill="black"/>
+          <text x="50%" y="50%" dy=".35em" text-anchor="middle" font-family="sans-serif" font-size="30vmin" font-weight="700" fill="white">THE S33K3R</text>
+        </mask>
+      </defs>
+    </svg>
+    <!-- Static canvas clipped to text -->
+    <canvas id="staticCanvas" class="absolute inset-0 w-full h-full" style="mask:url(#titleMask) center/contain no-repeat;-webkit-mask:url(#titleMask) center/contain no-repeat;"></canvas>
+    <!-- Accessible heading for screen readers -->
+    <h1 class="sr-only">THE S33K3R</h1>
+    <div class="relative z-10 flex flex-col items-center space-y-8">
+      <div class="w-64 h-48 bg-gray-900 border-4 border-gray-700 rounded-lg flex items-center justify-center">
+        <div class="w-56 h-40 bg-black"></div>
+      </div>
+      <button @click="scrollTo('r3s3tSection'); playSfx()" class="px-6 py-3 bg-green-500 hover:bg-green-600 rounded text-lg">
+        Listen to the Broadcast
+      </button>
+    </div>
+  </header>
+
+  <main class="space-y-32">
+    <!-- R3S3T Embed Section -->
+    <section id="r3s3tSection" class="py-16 px-4" x-data="{}">
+      <h2 class="text-3xl text-center mb-8">R3S3T</h2>
+      <div class="max-w-2xl mx-auto space-y-4">
+        <div class="flex items-center justify-between text-sm font-mono text-gray-400">
+          <span>Released: 2025-07-01</span>
+          <span class="flex items-center"><i class="fab fa-youtube mr-1"></i>YouTube</span>
+          <span>◎ 1.2K listens</span>
+        </div>
+        <div class="aspect-w-16 aspect-h-9">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/-HufQZKmxJQ?si=gLfVTHLKrvSc5Okg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="w-full h-full" loading="lazy"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section (Terminal lore) -->
+    <section class="px-4" x-data="timeline()">
+      <div class="bg-black border border-green-600 p-6 font-mono text-green-400 max-w-3xl mx-auto mb-8">
+        <p>> THE S33K3R uplink established.<span class="terminal-cursor">_</span></p>
+        <p class="mt-2">> Broadcasting clandestine resistance.<span class="terminal-cursor">_</span></p>
+      </div>
+      <!-- Timeline -->
+      <div class="max-w-3xl mx-auto" x-init="init()">
+        <div class="flex space-x-4 overflow-x-auto pb-2 mb-4">
+          <template x-for="(ev, idx) in events" :key="idx">
+            <button class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded" :class="{'bg-green-600': selected === ev}" @click="select(ev)">
+              <span x-text="ev.title"></span>
+            </button>
+          </template>
+        </div>
+        <div class="bg-gray-800 p-4 rounded">
+          <h3 class="text-xl mb-2" x-text="selected.title"></h3>
+          <p x-text="selected.desc"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Incoming Projects Grid -->
+    <section class="px-4">
+      <h2 class="text-3xl text-center mb-8">Incoming Projects</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="glitch p-6 bg-gray-800 rounded shadow-lg text-center">FABRICATED INTELLIGENCE<br><span class="text-sm text-gray-400">Coming Soon...</span></div>
+        <div class="glitch p-6 bg-gray-800 rounded shadow-lg text-center">HOUSE OF 8<br><span class="text-sm text-gray-400">Coming Soon...</span></div>
+        <div class="glitch p-6 bg-gray-800 rounded shadow-lg text-center">THE BREACH<br><span class="text-sm text-gray-400">Coming Soon...</span></div>
+        <div class="glitch p-6 bg-gray-800 rounded shadow-lg text-center">CHRONAEA<br><span class="text-sm text-gray-400">Coming Soon...</span></div>
+        <div class="glitch p-6 bg-gray-800 rounded shadow-lg text-center">S33K3R TRANSMISSION<br><span class="text-sm text-gray-400">Coming Soon...</span></div>
+      </div>
+    </section>
+
+    <!-- Join the Resistance -->
+    <section class="py-16 px-4 md:px-16">
+      <h2 class="text-3xl mb-4">Join the Resistance</h2>
+      <div class="bg-black border border-green-600 p-6 font-mono text-green-400 flex items-center space-x-2">
+        <span>>_</span>
+        <input type="email" placeholder="Enter your call sign" class="bg-black outline-none flex-1" />
+        <button @click="playSfx()" class="px-4 py-2 bg-green-500 hover:bg-green-600 rounded">ENTER ↵</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-8 bg-gray-800 text-center space-y-2">
+    <div>
+      <p>Paradigm Evolution Productions is Watching.</p>
+      <p>The Reset Has Already Begun.</p>
+    </div>
+    <div class="flex justify-center space-x-4 text-2xl">
+      <a href="#" class="hover:text-green-400"><i class="fab fa-twitter"></i></a>
+      <a href="#" class="hover:text-green-400"><i class="fab fa-youtube"></i></a>
+    </div>
+  </footer>
+
+  <!-- Static Noise & Console Scripts -->
+  <audio id="static-sfx" src="static-click.mp3" preload="auto"></audio>
+  <script>
+    function pageState() {
+      return {
+        realityMode: false,
+        consoleMsgs: [],
+        toggleReality() { this.realityMode = !this.realityMode; },
+        playSfx() { const a = document.getElementById('static-sfx'); a.currentTime=0; a.play(); },
+        scrollTo(id) { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }
+      }
+    }
+    function timeline() {
+      return {
+        events: [
+          { title: 'First Transmission', desc: 'THE S33K3R broadcasts first signal.' },
+          { title: 'Paradigm Evolution Formed', desc: 'Production front emerges.' },
+          { title: '“R3S3T” Released', desc: 'Debut single emerges from the shadows.' }
+        ],
+        selected: {},
+        init() { this.selected = this.events[0]; },
+        select(ev) { this.selected = ev; }
+      }
+    }
+    // Static noise generator
+    function startStatic() {
+      const canvas = document.getElementById('staticCanvas');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d');
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+      function draw() {
+        const img = ctx.createImageData(canvas.width, canvas.height);
+        for (let i = 0; i < img.data.length; i += 4) {
+          const shade = Math.random() * 255;
+          img.data[i] = img.data[i+1] = img.data[i+2] = shade;
+          img.data[i+3] = 255;
+        }
+        ctx.putImageData(img, 0, 0);
+      }
+      setInterval(draw, 50);
+    }
+    document.addEventListener('alpine:init', () => { startStatic(); });
+    // Live console feed simulation
+    setInterval(() => {
+      const msgs = ['[SYS] Decoding...', '[RX] Message received.', '[ALERT] Static rising.', '[CLI] > reboot sequence active...'];
+      const data = document.querySelector('html').__x.$data;
+      data.consoleMsgs.push(msgs[Math.floor(Math.random() * msgs.length)]);
+      if (data.consoleMsgs.length > 20) data.consoleMsgs.shift();
+    }, 2000);
+  </script>
+</body>
+</html>
