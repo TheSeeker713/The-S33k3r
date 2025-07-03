@@ -45,8 +45,20 @@
   </div>
 
   <!-- Hero Section -->
-  <header class="relative h-screen overflow-hidden flex items-center justify-center text-center">
-    <canvas id="staticCanvas" class="absolute inset-0 w-full h-full"></canvas>
+  <header class="relative h-screen overflow-hidden flex flex-col items-center justify-center text-center space-y-8">
+    <!-- Mask definition for text -->
+    <svg class="absolute w-0 h-0" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <mask id="titleMask" x="0" y="0" width="100%" height="100%" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
+          <rect width="1" height="1" fill="black"/>
+          <text x="50%" y="50%" dy=".35em" text-anchor="middle" font-family="sans-serif" font-size="20vw" font-weight="700" fill="white">THE S33K3R</text>
+        </mask>
+      </defs>
+    </svg>
+    <!-- Static canvas clipped to text -->
+    <canvas id="staticCanvas" class="absolute inset-0 w-full h-full" style="mask:url(#titleMask);-webkit-mask:url(#titleMask);"></canvas>
+    <!-- Accessible heading for screen readers -->
+    <h1 class="sr-only">THE S33K3R</h1>
     <div class="relative z-10 flex flex-col items-center space-y-8">
       <div class="w-64 h-48 bg-gray-900 border-4 border-gray-700 rounded-lg flex items-center justify-center">
         <div class="w-56 h-40 bg-black"></div>
@@ -64,11 +76,11 @@
       <div class="max-w-2xl mx-auto space-y-4">
         <div class="flex items-center justify-between text-sm font-mono text-gray-400">
           <span>Released: 2025-07-01</span>
-          <span class="flex items-center"><i class="fab fa-spotify mr-1"></i>Spotify</span>
+          <span class="flex items-center"><i class="fab fa-youtube mr-1"></i>YouTube</span>
           <span>◎ 1.2K listens</span>
         </div>
         <div class="aspect-w-16 aspect-h-9">
-          <iframe class="w-full h-full" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="R3S3T" loading="lazy" allowfullscreen></iframe>
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/-HufQZKmxJQ?si=gLfVTHLKrvSc5Okg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="w-full h-full" loading="lazy"></iframe>
         </div>
       </div>
     </section>
@@ -127,7 +139,6 @@
     <div class="flex justify-center space-x-4 text-2xl">
       <a href="#" class="hover:text-green-400"><i class="fab fa-twitter"></i></a>
       <a href="#" class="hover:text-green-400"><i class="fab fa-youtube"></i></a>
-      <a href="#" class="hover:text-green-400"><i class="fab fa-spotify"></i></a>
     </div>
   </footer>
 
